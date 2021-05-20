@@ -58,11 +58,6 @@ const getFilename = (res, data) => {
 };
 
 module.exports = (uri, output, opts) => {
-	if (typeof output === 'object') {
-		opts = output;
-		output = null;
-	}
-
 	opts = Object.assign({
 		encoding: null,
 		rejectUnauthorized: process.env.npm_config_strict_ssl !== 'false'
@@ -76,11 +71,17 @@ module.exports = (uri, output, opts) => {
 	}).then(result => {
 		const [data, res] = result;
 
-		if (!output) {
-			return opts.extract && archiveType(data) ? decompress(data, opts) : data;
+		let filename;
+		if (opts.filename) {
+			filename = opts.filename;
+		} else {
+			let autoFilename = filenamify(getFilename(res, data));
+			if (opts.filenameBase) {
+				filename = `${filenamify(opts.filenameBase)}.${path.extname(autoFilename)}`;
+			} else {
+				filename = autoFilename;
+			}
 		}
-
-		const filename = opts.filename || filenamify(getFilename(res, data));
 		const outputFilepath = path.join(output, filename);
 
 		if (opts.extract && archiveType(data)) {
@@ -89,7 +90,7 @@ module.exports = (uri, output, opts) => {
 
 		return makeDir(path.dirname(outputFilepath))
 			.then(() => fsP.writeFile(outputFilepath, data))
-			.then(() => data);
+			.then(() => filename);
 	});
 
 	stream.then = promise.then.bind(promise);
