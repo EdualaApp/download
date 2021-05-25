@@ -50,7 +50,10 @@ const getFilename = (res, data) => {
 		const ext = (fileType(data) || {}).ext || getExtFromMime(res);
 
 		if (ext) {
-			filename = `${filename}.${ext}`;
+			if (!ext.startsWith('.')) {
+				filename += '.';
+			}
+			filename = `${filename}${ext}`;
 		}
 	}
 
