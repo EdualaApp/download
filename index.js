@@ -80,7 +80,7 @@ module.exports = (uri, output, opts) => {
 		} else {
 			let autoFilename = filenamify(getFilename(res, data));
 			if (opts.filenameBase) {
-				filename = `${filenamify(opts.filenameBase)}.${path.extname(autoFilename)}`;
+				filename = `${filenamify(opts.filenameBase)}${path.extname(autoFilename)}`;
 			} else {
 				filename = autoFilename;
 			}
